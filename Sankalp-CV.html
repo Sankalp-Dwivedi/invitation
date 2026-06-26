@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sankalp Dwivedi — ML Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --indigo:    #1A1040;
+    --violet:    #2D1B69;
+    --teal:      #0FCCCE;
+    --teal-dim:  #0aa8aa;
+    --amber:     #FFB800;
+    --white:     #FFFFFF;
+    --offwhite:  #F6F7FB;
+    --text:      #1C1C2E;
+    --muted:     #6B7280;
+    --line:      #E5E7EB;
+    --sidebar-w: 62mm;
+    --page-w:    210mm;
+    --page-h:    297mm;
+  }
+
+  html { font-size: 11px; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--offwhite);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 32px;
+  }
+
+  /* ── PRINT / DOWNLOAD BAR ── */
+  .print-bar {
+    width: var(--page-w);
+    max-width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+  }
+  .print-btn {
+    font-family: 'Outfit', sans-serif;
+    font-size: .85rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%);
+    color: var(--white);
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(26,16,64,.25);
+  }
+  .print-btn:hover { opacity: .92; }
+
+  /* ── PAGES CONTAINER ── */
+  .pages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  /* ── SINGLE A4 PAGE ── */
+  .page {
+    display: flex;
+    width: var(--page-w);
+    height: var(--page-h);
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 12px 40px rgba(26,16,64,.18), 0 2px 8px rgba(0,0,0,.06);
+    page-break-after: always;
+    break-after: page;
+  }
+  .page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    background: linear-gradient(175deg, var(--indigo) 0%, var(--violet) 100%);
+    color: var(--white);
+    padding: 22px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .sidebar::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(15,204,206,.12);
+    pointer-events: none;
+  }
+  .sidebar::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,184,0,.07);
+    pointer-events: none;
+  }
+
+  .avatar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .avatar {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal) 0%, var(--amber) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem; font-weight: 800;
+    color: var(--indigo);
+    border: 3px solid rgba(255,255,255,.15);
+    letter-spacing: -1px;
+  }
+  .sidebar-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    line-height: 1.25;
+    color: #fff;
+  }
+  .sidebar-role {
+    font-size: .68rem;
+    font-weight: 500;
+    color: var(--teal);
+    text-align: center;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .s-divider {
+    height: 1px;
+    background: rgba(255,255,255,.1);
+    margin: 0 -4px;
+    flex-shrink: 0;
+  }
+
+  .s-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: .58rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 7px;
+  }
+
+  .contact-list { display: flex; flex-direction: column; gap: 7px; }
+  .contact-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: .68rem; color: rgba(255,255,255,.82); line-height: 1.35;
+  }
+  .c-icon {
+    width: 18px; height: 18px; flex-shrink: 0;
+    border-radius: 5px;
+    background: rgba(15,204,206,.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .6rem;
+    color: var(--teal);
+    margin-top: 1px;
+  }
+
+  .chip-group { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .55rem;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.85);
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  .chip.hl { background: rgba(15,204,206,.18); border-color: rgba(15,204,206,.35); color: var(--teal); }
+
+  .cert-list { display: flex; flex-direction: column; gap: 5px; }
+  .cert-item {
+    font-size: .62rem;
+    color: rgba(255,255,255,.75);
+    line-height: 1.35;
+    padding-left: 12px;
+    position: relative;
+  }
+  .cert-item::before {
+    content: '▸';
+    position: absolute; left: 0;
+    color: var(--amber);
+    font-size: .55rem;
+    top: 2px;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    min-width: 0;
+    background: var(--white);
+    padding: 22px 20px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
+  }
+
+  .hero { border-bottom: 2px solid var(--line); padding-bottom: 12px; flex-shrink: 0; }
+  .hero-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--indigo);
+    line-height: 1.05;
+    letter-spacing: -.02em;
+  }
+  .hero-name span { color: var(--teal); }
+  .hero-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: .82rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-top: 3px;
+    letter-spacing: .03em;
+  }
+  .hero-summary {
+    margin-top: 8px;
+    font-size: .72rem;
+    line-height: 1.55;
+    color: #3D3D55;
+    border-left: 3px solid var(--teal);
+    padding-left: 10px;
+  }
+
+  .section { display: flex; flex-direction: column; gap: 10px; }
+  .section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--indigo);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--line) 0%, transparent 100%);
+  }
+  .section-title .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--teal);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .timeline { display: flex; flex-direction: column; gap: 12px; }
+  .tl-entry { display: flex; gap: 12px; page-break-inside: avoid; break-inside: avoid; }
+  .tl-line {
+    display: flex; flex-direction: column; align-items: center;
+    flex-shrink: 0;
+    width: 14px;
+  }
+  .tl-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 2px solid var(--teal);
+    background: #fff;
+    flex-shrink: 0;
+    margin-top: 3px;
+    box-shadow: 0 0 0 2px rgba(15,204,206,.12);
+  }
+  .tl-stem {
+    flex: 1;
+    width: 1px;
+    background: linear-gradient(180deg, var(--teal) 0%, var(--line) 100%);
+    margin-top: 3px;
+  }
+  .tl-entry:last-child .tl-stem { display: none; }
+
+  .tl-body { flex: 1; padding-bottom: 2px; }
+  .tl-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+  .tl-company {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: .82rem;
+    color: var(--indigo);
+  }
+  .tl-role {
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--teal-dim);
+    margin-top: 1px;
+  }
+  .tl-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .58rem;
+    color: var(--muted);
+    white-space: nowrap;
+    background: var(--offwhite);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    margin-top: 2px;
+  }
+  .tl-bullets {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    list-style: none;
+  }
+  .tl-bullets li {
+    font-size: .68rem;
+    color: #3D3D55;
+    line-height: 1.45;
+    padding-left: 12px;
+    position: relative;
+  }
+  .tl-bullets li::before {
+    content: '→';
+    position: absolute; left: 0;
+    color: var(--amber);
+    font-size: .58rem;
+    top: 2px;
+  }
+
+  .project-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .proj-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    position: relative;
+    overflow: hidden;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .proj-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--teal), var(--amber));
+  }
+  .proj-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: .76rem;
+    color: var(--indigo);
+    line-height: 1.25;
+    margin-bottom: 3px;
+  }
+  .proj-stack {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .52rem;
+    color: var(--teal-dim);
+    margin-bottom: 5px;
+  }
+  .proj-desc {
+    font-size: .64rem;
+    color: #4A4A60;
+    line-height: 1.45;
+  }
+
+  .edu-list { display: flex; flex-direction: column; gap: 8px; }
+  .edu-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .edu-badge {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .6rem; font-weight: 700;
+    color: var(--teal);
+    font-family: 'Outfit', sans-serif;
+    flex-shrink: 0;
+  }
+  .edu-degree {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: .76rem;
+    color: var(--indigo);
+  }
+  .edu-inst { font-size: .66rem; color: var(--muted); margin-top: 1px; }
+  .edu-year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .58rem;
+    color: var(--amber);
+    font-weight: 600;
+  }
+
+  .ach-list { display: flex; flex-direction: column; gap: 6px; }
+  .ach-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: .68rem; color: #3D3D55; line-height: 1.45;
+  }
+  .ach-icon {
+    width: 16px; height: 16px; flex-shrink: 0;
+    border-radius: 5px;
+    background: rgba(255,184,0,.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .58rem;
+    color: var(--amber);
+    margin-top: 1px;
+  }
+
+  .paper-list { display: flex; flex-direction: column; gap: 5px; }
+  .paper-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: .68rem; color: #3D3D55; font-style: italic;
+  }
+  .paper-item::before {
+    content: '📄';
+    font-size: .72rem;
+    font-style: normal;
+  }
+
+  .addl-list { display: flex; flex-wrap: wrap; gap: 5px; }
+  .addl-chip {
+    font-size: .64rem;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    color: var(--indigo);
+    font-weight: 500;
+    background: var(--offwhite);
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .footer {
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: .58rem;
+    color: var(--muted);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-shrink: 0;
+  }
+  .footer span { font-family: 'JetBrains Mono', monospace; }
+
+  .sidebar-block { position: relative; z-index: 1; }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  @media print {
+    html { font-size: 11px; }
+
+    body {
+      padding: 0;
+      background: #fff;
+      display: block;
+    }
+
+    .print-bar { display: none !important; }
+
+    .pages {
+      gap: 0;
+      display: block;
+    }
+
+    .page {
+      width: 210mm;
+      height: 297mm;
+      border-radius: 0;
+      box-shadow: none;
+      page-break-after: always;
+      break-after: page;
+      overflow: hidden;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+
+    .sidebar,
+    .avatar,
+    .edu-badge,
+    .proj-card::before {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="print-bar">
+  <button class="print-btn" onclick="window.print()">Download PDF (Print)</button>
+</div>
+
+<div class="pages">
+
+  <!-- ═══════════ PAGE 1 ═══════════ -->
+  <div class="page page-1">
+
+    <aside class="sidebar">
+      <div class="avatar-wrap">
+        <div class="avatar">SD</div>
+        <div>
+          <div class="sidebar-name">Sankalp Dwivedi</div>
+          <div class="sidebar-role">ML / AI Engineer</div>
+        </div>
+      </div>
+
+      <div class="s-divider"></div>
+
+      <div class="sidebar-block">
+        <div class="s-label">Contact</div>
+        <div class="contact-list">
+          <div class="contact-item">
+            <div class="c-icon">✆</div>
+            <span>+91-8795954419</span>
+          </div>
+          <div class="contact-item">
+            <div class="c-icon">✉</div>
+            <span>dwivedisankalp02<br>@gmail.com</span>
+          </div>
+          <div class="contact-item">
+            <div class="c-icon">in</div>
+            <span>sankalp-dwivedi<br>-9b18b320b</span>
+          </div>
+          <div class="contact-item">
+            <div class="c-icon">📍</div>
+            <span>Lucknow, India</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="s-divider"></div>
+
+      <div class="sidebar-block">
+        <div class="s-label">Languages</div>
+        <div class="chip-group">
+          <span class="chip hl">Python</span>
+          <span class="chip hl">Ruby</span>
+          <span class="chip">JavaScript</span>
+          <span class="chip">GO</span>
+          <span class="chip">SQL</span>
+          <span class="chip">HTML/CSS</span>
+        </div>
+      </div>
+
+      <div class="sidebar-block">
+        <div class="s-label">Frameworks &amp; Tools</div>
+        <div class="chip-group">
+          <span class="chip hl">Ruby on Rails</span>
+          <span class="chip">Django</span>
+          <span class="chip">Flask</span>
+          <span class="chip">ReactJS</span>
+          <span class="chip">Docker</span>
+          <span class="chip">LangChain</span>
+          <span class="chip">GraphQL</span>
+          <span class="chip">Laravel</span>
+          <span class="chip">pyngrok</span>
+          <span class="chip">CI/CD</span>
+        </div>
+      </div>
+
+      <div class="sidebar-block">
+        <div class="s-label">ML / AI Libraries</div>
+        <div class="chip-group">
+          <span class="chip hl">TensorFlow</span>
+          <span class="chip hl">Hugging Face</span>
+          <span class="chip">Scikit-learn</span>
+          <span class="chip">SpeechBrain</span>
+          <span class="chip">NumPy</span>
+          <span class="chip">pandas</span>
+          <span class="chip">transformers</span>
+          <span class="chip">Seaborn</span>
+          <span class="chip">matplotlib</span>
+        </div>
+      </div>
+
+      <div class="sidebar-block">
+        <div class="s-label">Cloud Platforms</div>
+        <div class="chip-group">
+          <span class="chip hl">AWS</span>
+          <span class="chip hl">GCP</span>
+        </div>
+      </div>
+
+      <div class="sidebar-block">
+        <div class="s-label">Databases</div>
+        <div class="chip-group">
+          <span class="chip">PostgreSQL</span>
+          <span class="chip">MySQL</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="hero">
+        <div class="hero-name">Sankalp <span>Dwivedi</span></div>
+        <div class="hero-title">Machine Learning Engineer · Full-Stack AI Developer · NLP &amp; Speech Specialist</div>
+        <p class="hero-summary">
+          Passionate software developer with a strong background in AI-driven solutions integrated into
+          full-stack environments. Proven expertise in developing custom modules, REST &amp; GraphQL APIs,
+          LLM-based systems, and speech/vision models. Adept at cloud deployment (AWS, GCP), multi-tenant
+          architecture, and research-backed ML development — with excellent communication and collaboration skills.
+        </p>
+      </div>
+
+      <section class="section">
+        <div class="section-title"><span class="dot"></span> Professional Experience</div>
+        <div class="timeline">
+
+          <div class="tl-entry">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-stem"></div></div>
+            <div class="tl-body">
+              <div class="tl-top">
+                <div>
+                  <div class="tl-company">Hipster Inc <span style="color:var(--muted);font-weight:400;font-size:.68rem">— Lucknow, India</span></div>
+                  <div class="tl-role">AI / ML Engineer</div>
+                </div>
+                <div class="tl-date">June 2025 – Present</div>
+              </div>
+              <ul class="tl-bullets">
+                <li>Designed and deployed AI-driven solutions integrated into full-stack environments built using Ruby on Rails, Laravel, and React.</li>
+                <li>Built REST and GraphQL APIs to serve ML inference results to frontend and backend applications.</li>
+                <li>Worked on LLM-based chatbots, recommendation engines, and computer vision modules tailored for various client projects.</li>
+                <li>Collaborated with cross-functional teams to implement end-to-end AI workflows — from data collection and preprocessing to deployment.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tl-entry">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-stem"></div></div>
+            <div class="tl-body">
+              <div class="tl-top">
+                <div>
+                  <div class="tl-company">Pinnacle Labs Pvt Ltd <span style="color:var(--muted);font-weight:400;font-size:.68rem">— Remote</span></div>
+                  <div class="tl-role">Data Science Intern</div>
+                </div>
+                <div class="tl-date">May 2024 – June 2024</div>
+              </div>
+              <ul class="tl-bullets">
+                <li>Explored the role of data science in the software industry and solved real-world big data challenges.</li>
+                <li>Implemented data visualization techniques to communicate insights to stakeholders effectively.</li>
+                <li>Optimized machine learning models for improved prediction accuracy and performance.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tl-entry">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-stem"></div></div>
+            <div class="tl-body">
+              <div class="tl-top">
+                <div>
+                  <div class="tl-company">Campus Valley <span style="color:var(--muted);font-weight:400;font-size:.68rem">— Remote</span></div>
+                  <div class="tl-role">Data Science Intern</div>
+                </div>
+                <div class="tl-date">April 2024 – May 2024</div>
+              </div>
+              <ul class="tl-bullets">
+                <li>Built projects including Titanic Prediction using supervised and unsupervised learning techniques.</li>
+                <li>Identified, analyzed, and interpreted trends in complex datasets; performed advanced data extraction and manipulation.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tl-entry">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-stem"></div></div>
+            <div class="tl-body">
+              <div class="tl-top">
+                <div>
+                  <div class="tl-company">Hipster Inc <span style="color:var(--muted);font-weight:400;font-size:.68rem">— Lucknow, India</span></div>
+                  <div class="tl-role">Ruby on Rails Developer</div>
+                </div>
+                <div class="tl-date">Sep 2021 – Aug 2023</div>
+              </div>
+              <ul class="tl-bullets">
+                <li>Worked as backend developer on Ruby on Rails, building robust and scalable applications.</li>
+                <li>Created custom APIs for seamless integration with third-party services, expanding application functionality.</li>
+                <li>Collaborated closely with clients to translate requirements into technical specifications.</li>
+                <li>Debugged complex software issues, leading to more stable product releases.</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <!-- ═══════════ PAGE 2 ═══════════ -->
+  <div class="page page-2">
+
+    <aside class="sidebar">
+      <div class="sidebar-block">
+        <div class="s-label">Rails Gems</div>
+        <div class="chip-group">
+          <span class="chip">rails-admin</span>
+          <span class="chip">Soidus</span>
+          <span class="chip">Brakeman</span>
+          <span class="chip">CanCan</span>
+          <span class="chip">Nokogiri</span>
+          <span class="chip">Ratonvirus</span>
+        </div>
+      </div>
+
+      <div class="s-divider"></div>
+
+      <div class="sidebar-block">
+        <div class="s-label">Version Control</div>
+        <div class="chip-group">
+          <span class="chip">Git</span>
+          <span class="chip">GitHub</span>
+          <span class="chip">BitBucket</span>
+        </div>
+      </div>
+
+      <div class="s-divider"></div>
+
+      <div class="sidebar-block">
+        <div class="s-label">Certifications</div>
+        <div class="cert-list">
+          <div class="cert-item">Oracle Fusion AI Agent Studio — Foundations Associate</div>
+          <div class="cert-item">Oracle AI Vector Search — Certified Professional</div>
+          <div class="cert-item">Oracle APEX Cloud Developer — Certified Professional</div>
+          <div class="cert-item">Business Intelligence &amp; Data Analytics — Macquarie University</div>
+          <div class="cert-item">Introduction to Data Analytics — IBM</div>
+          <div class="cert-item">Data Visualization (Excel &amp; Cognos) — IBM</div>
+          <div class="cert-item">Python Programming — University of Michigan</div>
+          <div class="cert-item">Intel AI Global Impact — Generative AI</div>
+          <div class="cert-item">GenAI Skill Badge — Google Cloud</div>
+          <div class="cert-item">Vertex AI Skill Badge — Google Cloud</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="section">
+        <div class="section-title"><span class="dot"></span> Key Projects</div>
+        <div class="project-grid">
+
+          <div class="proj-card">
+            <div class="proj-title">IgniteStudy — AI Study Material Builder</div>
+            <div class="proj-stack">Python · Hugging Face · BART/T5 · BeautifulSoup · FPDF · TTS APIs · Cloud AI</div>
+            <p class="proj-desc">AI-driven platform that automatically generates structured study materials — PDFs and video lectures — for any topic using transformer-based summarization (BART, T5), advanced web scraping, and AI-driven video lecture creation pipelines.</p>
+          </div>
+
+          <div class="proj-card">
+            <div class="proj-title">Speech Emotion &amp; Gender Recognition</div>
+            <div class="proj-stack">Python · Flask · PyTorch · Hugging Face · SpeechBrain · torchaudio · librosa</div>
+            <p class="proj-desc">Flask-based system to recognize emotions (happy, sad, angry, etc.) and gender from speech audio. Used pre-trained wav2vec models and integrated SpeechBrain for preprocessing and feature extraction.</p>
+          </div>
+
+          <div class="proj-card">
+            <div class="proj-title">Interactive Chatbot with LLMs</div>
+            <div class="proj-stack">Python · LangChain · Pinecone · Hugging Face · Web Scraping</div>
+            <p class="proj-desc">Context-aware chatbot that answers questions using LLMs and a Pinecone vector database. Scraped website content (e.g., Changi Airport), embedded it into vectors, and used LLMs for intelligent, relevant responses.</p>
+          </div>
+
+          <div class="proj-card">
+            <div class="proj-title">DomainNest — Multi-Tenant E-commerce</div>
+            <div class="proj-stack">Ruby on Rails 7.2 · MySQL · ReactJS · Docker · GitHub CI · PWA</div>
+            <p class="proj-desc">Multi-tenant e-commerce platform with subdomain-based tenant routing and row-level multi-tenancy. Leveraged Rails 7.2 features including PWA support, GitHub CI workflows, and an integrated admin panel via rails-admin gem.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><span class="dot"></span> Additional Projects</div>
+        <div class="addl-list">
+          <span class="addl-chip">🤖 MasterQuestionBuilder — Question Generator AI Model</span>
+          <span class="addl-chip">🎥 Emotion Detection from Videos &amp; Real-Time Feed</span>
+          <span class="addl-chip">🎬 Movies Recommendation System</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><span class="dot"></span> Education</div>
+        <div class="edu-list">
+          <div class="edu-item">
+            <div class="edu-badge">PG</div>
+            <div>
+              <div class="edu-degree">Master of Computer Applications — AI / ML</div>
+              <div class="edu-inst">Chandigarh University</div>
+              <div class="edu-year">2025</div>
+            </div>
+          </div>
+          <div class="edu-item">
+            <div class="edu-badge">UG</div>
+            <div>
+              <div class="edu-degree">Bachelor of Computer Applications (BCA)</div>
+              <div class="edu-inst">Lucknow Public College of Professional Studies</div>
+              <div class="edu-year">2023</div>
+            </div>
+          </div>
+          <div class="edu-item">
+            <div class="edu-badge">12</div>
+            <div>
+              <div class="edu-degree">High School — Intermediate</div>
+              <div class="edu-inst">Lucknow Public School</div>
+              <div class="edu-year">2020</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="two-col">
+        <section class="section">
+          <div class="section-title"><span class="dot"></span> Achievements</div>
+          <div class="ach-list">
+            <div class="ach-item">
+              <div class="ach-icon">🏆</div>
+              <span>Headed the Academic Committee, organized 5+ events &amp; workshops, driving a <strong>40% increase</strong> in student participation.</span>
+            </div>
+            <div class="ach-item">
+              <div class="ach-icon">⚔️</div>
+              <span><strong>6kyu coder</strong> on Codewars with Honor 207 — global competitive programming platform.</span>
+            </div>
+            <div class="ach-item">
+              <div class="ach-icon">☁️</div>
+              <span>Completed <strong>Google Cloud Bootcamp</strong> via GDSC, earning multiple Cloud skill badges.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-title"><span class="dot"></span> Research Papers</div>
+          <div class="paper-list">
+            <div class="paper-item">Implementing Machine Learning using Ruby on Rails</div>
+            <div class="paper-item">From Fields to Algorithms: Enhancing Indian Agriculture with Machine Learning</div>
+          </div>
+          <div style="margin-top:10px;">
+            <div class="section-title"><span class="dot"></span> Core Competencies</div>
+            <div class="chip-group" style="margin-top:6px;">
+              <span class="addl-chip">OOP</span>
+              <span class="addl-chip">NLP</span>
+              <span class="addl-chip">Transformer Fine-Tuning</span>
+              <span class="addl-chip">Multi-Tenant Architecture</span>
+              <span class="addl-chip">Feature Engineering</span>
+              <span class="addl-chip">Speech &amp; Video Emotion Recognition</span>
+              <span class="addl-chip">Scalable AI Systems</span>
+              <span class="addl-chip">Responsive Web Design / PWA</span>
+              <span class="addl-chip">Research Paper Writing</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="footer">
+        <span>I hereby declare that the above information is true in all senses. — Sankalp Dwivedi</span>
+        <span style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:.55rem;">ML Engineer · Lucknow, India</span>
+      </div>
+    </main>
+
+  </div>
+
+</div>
+</body>
+</html>
