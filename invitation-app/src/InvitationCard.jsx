@@ -49,7 +49,7 @@ export default function InvitationCard() {
         <div className="detail-row">
           🕥 <b>पूजन प्रारम्भ :</b> प्रातः 10:30 बजे
         </div>
-        <div className="detail-row">🕥 <b>सुंदरकांड पाठ :</b> प्रातः 3:00 बजे</div>
+        <div className="detail-row">🕥 <b>सुंदरकांड पाठ</b></div>
         <div className="detail-row">🙏 तत्पश्चात प्रसाद एवं भोजन</div>
       </div>
 
