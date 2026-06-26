@@ -49,8 +49,8 @@ export default function InvitationCard() {
         <div className="detail-row">
           🕥 <b>पूजन प्रारम्भ :</b> प्रातः 10:30 बजे
         </div>
-        <div className="detail-row">🕥 <b>सुंदरकांड पाठ</b></div>
-        <div className="detail-row">🙏 तत्पश्चात प्रसाद एवं भोजन</div>
+        <div className="detail-row"> <b>सुंदरकांड पाठ</b></div>
+        {/* <div className="detail-row">🙏 प्रसाद एवं भोजन</div> */}
       </div>
 
       <div className="footer reveal" style={{ '--d': '1.15s' }}>
